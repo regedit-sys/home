@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>x11 > wayland</title>
+    <!-- Tailwind CSS CDN for basic styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS for the image itself */
+        .tilt-image {
+            perspective: 1000px; /* Gives the 3D effect to the image directly */
+            transition: transform 0.1s ease-out; /* Smooth transition for the image's transform */
+            transform-style: preserve-3d; /* Ensures children (if any, though not here) also get 3D transforms */
+            will-change: transform; /* Optimizes performance for transform changes */
+            /* Add a subtle shadow for better visual depth */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Apply dark mode styles based on user's preference */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a202c; /* A dark gray background for dark mode */
+            }
+            .tilt-image {
+                /* Adjust shadow for dark mode if needed, or keep it consistent */
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+            }
+        }
+
+        /* Apply light mode styles based on user's preference (default) */
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #f7fafc; /* A light gray background for light mode */
+            }
+        }
+
+        /* Default body styling for centering content */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: sans-serif;
+            transition: background-color 0.3s ease; /* Smooth transition for background color change */
+        }
+    </style>
+</head>
+<body>
+    <!-- The image now directly has the dimensions, rounded corners, and shadow -->
+    <img
+        src="https://i.ibb.co/cSJNVd4g/X-Org-Logo-removebg-preview.png"
+        alt="X-Org Logo"
+        class="tilt-image object-cover rounded-xl overflow-hidden"
+        onerror="this.onerror=null; this.src='https://placehold.co/300x300/F0F0F0/333333?text=Image+Not+Found';"
+    >
+
+    <script>
+        // Get the image element directly, as it's now the main interactive element
+        const tiltImage = document.querySelector('.tilt-image');
+
+        // Define the maximum tilt angle in degrees
+        const maxTilt = 15;
+
+        // Add a mousemove event listener to the image itself
+        tiltImage.addEventListener('mousemove', (e) => {
+            // Get the bounding rectangle of the image
+            const rect = tiltImage.getBoundingClientRect();
+
+            // Calculate the mouse position relative to the center of the image
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // Calculate the offset from the center
+            const offsetX = e.clientX - centerX;
+            const offsetY = e.clientY - centerY;
+
+            // Normalize the offset to a value between -1 and 1
+            const normalizeX = offsetX / (rect.width / 2);
+            const normalizeY = offsetY / (rect.height / 2);
+
+            // Calculate the tilt angles
+            const tiltY = normalizeX * maxTilt; // Rotation around Y-axis (for horizontal mouse movement)
+            const tiltX = -normalizeY * maxTilt; // Rotation around X-axis (for vertical mouse movement, inverted)
+
+            // Apply the transform to the image
+            tiltImage.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+        });
+
+        // Add a mouseleave event listener to reset the tilt when the mouse leaves the image
+        tiltImage.addEventListener('mouseleave', () => {
+            // Reset the transform to its original state
+            tiltImage.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+    </script>
+</body>
+</html>
